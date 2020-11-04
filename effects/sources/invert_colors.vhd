@@ -9,13 +9,6 @@
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: Inverts or passes an RGB stream depending on the setting of a select signal
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
 ----------------------------------------------------------------------------------
 
 
