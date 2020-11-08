@@ -37,18 +37,25 @@ entity rgb2ycbcr is
            b : in STD_LOGIC_VECTOR (7 downto 0);
            y : out STD_LOGIC_VECTOR (7 downto 0);
            cb : out STD_LOGIC_VECTOR (7 downto 0);
-           cr : out STD_LOGIC_VECTOR (7 downto 0);
-           clk : in STD_LOGIC; -- device clock
-           pixel_clk : in STD_LOGIC);
+           cr : out STD_LOGIC_VECTOR (7 downto 0));
 end rgb2ycbcr;
 
 architecture Behavioral of rgb2ycbcr is
 
+    constant real_mult : integer := 10; -- multiply real constants by this power of 2
+
     -- values of K_R, K_G, K_B. (may not be needed depending on implementation
     -- assign them s.t. kr+kg+kb = 1
-    constant kr : real range 0.0 to 1.0 := 0.257;
-    constant kg : real range 0.0 to 1.0 := 0.504;
-    constant kb : real range 0.0 to 1.0 := 0.098;
+    constant kr : real range 0.0 to 1.0 := 0.299;
+    constant kg : real range 0.0 to 1.0 := 0.587;
+    constant kb : real range 0.0 to 1.0 := 0.114;
+    
+    constant mat_1_0 : real := -0.5 * kr / (1.0 - kb);
+    constant mat_1_1 : real := -0.5 * kg / (1.0 - kb);
+    constant mat_1_2 : real := 0.5;
+    constant mat_2_0 : real := 0.5;
+    constant mat_2_1 : real := -0.5 * kg / (1.0 - kr);
+    constant mat_2_2 : real := -0.5 * kb / (1.0 - kr);
     
     -- integer forms of the color channels
     signal r_val : integer;
@@ -58,14 +65,28 @@ architecture Behavioral of rgb2ycbcr is
     signal y_val : integer;
     signal cb_val: integer;
     signal cr_val: integer;
+    
+    function real_conv( real_num: real;
+                        power: integer := real_mult) return integer is
+    begin
+        return integer(real_num * real(2**power));
+    end function;
+        
+    function int_real_mult( real_num: real;
+                            int_num: integer) return integer is
+    begin
+        return real_conv(real_num) * int_num / (2 ** real_mult);
+    end function;
 
 begin
 
     r_val <= to_integer(unsigned(r));
-    b_val <= to_integer(unsigned(g));
-    g_val <= to_integer(unsigned(b));
+    g_val <= to_integer(unsigned(g));
+    b_val <= to_integer(unsigned(b));
     
-    -- conversion goes here
+    y_val <= 0 + int_real_mult(kr, r_val) + int_real_mult(kg, g_val) + int_real_mult(kb, b_val);
+    cb_val <= 128 + int_real_mult(mat_1_0, r_val) + int_real_mult(mat_1_1, g_val) + int_real_mult(mat_1_2, b_val);
+    cr_val <= 128 + int_real_mult(mat_2_0, r_val) + int_real_mult(mat_2_1, g_val) + int_real_mult(mat_2_2, b_val);
     
     y <= std_logic_vector(to_unsigned(y_val, y'length));
     cb<= std_logic_vector(to_unsigned(cb_val, cb'length));
