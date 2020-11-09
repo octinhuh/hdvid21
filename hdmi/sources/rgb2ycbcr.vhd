@@ -43,6 +43,7 @@ end rgb2ycbcr;
 architecture Behavioral of rgb2ycbcr is
 
     constant real_mult : integer := 10; -- multiply real constants by this power of 2
+    constant reg_len : integer := 18; -- length of the math buses
 
     -- values of K_R, K_G, K_B. (may not be needed depending on implementation
     -- assign them s.t. kr+kg+kb = 1
@@ -58,38 +59,49 @@ architecture Behavioral of rgb2ycbcr is
     constant mat_2_2 : real := -0.5 * kb / (1.0 - kr);
     
     -- integer forms of the color channels
-    signal r_val : integer;
-    signal g_val : integer;
-    signal b_val : integer;
+    signal r_val, g_val, b_val : unsigned(r'length - 1 downto 0);
     
-    signal y_val : integer;
-    signal cb_val: integer;
-    signal cr_val: integer;
+    signal y_val, cb_val, cr_val : unsigned(y'length - 1 downto 0);
     
+--    function real_conv( real_num: real;
+--                        power: integer := real_mult) return integer is
+--    begin
+--        return integer(real_num * real(2**power));
+--    end function;
+        
+--    function int_real_mult( real_num: real;
+--                            int_num: integer) return integer is
+--    begin
+--        return real_conv(real_num) * int_num / (2 ** real_mult);
+--    end function;
     function real_conv( real_num: real;
-                        power: integer := real_mult) return integer is
+                        power: integer := real_mult) return unsigned is
     begin
-        return integer(real_num * real(2**power));
+        return to_unsigned(integer(real_num * real(2**power)), reg_len);
     end function;
         
     function int_real_mult( real_num: real;
-                            int_num: integer) return integer is
+                            int_num: unsigned) return unsigned is
+    variable temp : std_logic_vector(reg_len - 1 downto 0);
+    variable conv : std_logic_vector(real_mult + reg_len - 3 downto 0);
     begin
-        return real_conv(real_num) * int_num / (2 ** real_mult);
+        conv := std_logic_vector(real_conv(real_num) * int_num);
+        temp := conv(reg_len - 1 downto 0);
+        return unsigned(temp(temp'length - 1 downto real_mult));
     end function;
 
 begin
 
-    r_val <= to_integer(unsigned(r));
-    g_val <= to_integer(unsigned(g));
-    b_val <= to_integer(unsigned(b));
+    r_val <= unsigned(r);
+    g_val <= unsigned(g);
+    b_val <= unsigned(b);
     
-    y_val <= 0 + int_real_mult(kr, r_val) + int_real_mult(kg, g_val) + int_real_mult(kb, b_val);
+    y_val <= int_real_mult(kr, r_val) + int_real_mult(kg, g_val) + int_real_mult(kb, b_val);
     cb_val <= 128 + int_real_mult(mat_1_0, r_val) + int_real_mult(mat_1_1, g_val) + int_real_mult(mat_1_2, b_val);
     cr_val <= 128 + int_real_mult(mat_2_0, r_val) + int_real_mult(mat_2_1, g_val) + int_real_mult(mat_2_2, b_val);
     
-    y <= std_logic_vector(to_unsigned(y_val, y'length));
-    cb<= std_logic_vector(to_unsigned(cb_val, cb'length));
-    cr<= std_logic_vector(to_unsigned(cr_val, cr'length));
+    y <= std_logic_vector(y_val);
+    cb<= std_logic_vector(cb_val);
+    cr<= std_logic_vector(cr_val);
 
 end Behavioral;
