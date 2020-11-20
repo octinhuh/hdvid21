@@ -63,17 +63,6 @@ architecture Behavioral of rgb2ycbcr is
     
     signal y_val, cb_val, cr_val : unsigned(y'length - 1 downto 0);
     
---    function real_conv( real_num: real;
---                        power: integer := real_mult) return integer is
---    begin
---        return integer(real_num * real(2**power));
---    end function;
-        
---    function int_real_mult( real_num: real;
---                            int_num: integer) return integer is
---    begin
---        return real_conv(real_num) * int_num / (2 ** real_mult);
---    end function;
     function real_conv( real_num: real;
                         power: integer := real_mult) return unsigned is
     begin
