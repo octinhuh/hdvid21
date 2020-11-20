@@ -10,26 +10,11 @@
 -- Tool Versions: 
 -- Description: 
 -- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.01 - File Created
--- Additional Comments:
--- 
 ----------------------------------------------------------------------------------
 
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
--- Uncomment the following library declaration if using
--- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
-
--- Uncomment the following library declaration if instantiating
--- any Xilinx leaf cells in this code.
---library UNISIM;
---use UNISIM.VComponents.all;
 
 entity invert_colors_tb is
 --  Port ( );
@@ -39,8 +24,7 @@ architecture Behavioral of invert_colors_tb is
     
     -- Module
     component invert_colors
-    Port ( clk              : in STD_LOGIC;                                 -- Clock
-           sel              : in STD_LOGIC;                                 -- Select
+    Port ( sel              : in STD_LOGIC;                                 -- Select
            rgb_in           : in STD_LOGIC_VECTOR(23 downto 0);             -- RGB (Input)
            rgb_out          : out STD_LOGIC_VECTOR(23 downto 0));           -- RGB (Output)
     end component;
@@ -59,7 +43,7 @@ architecture Behavioral of invert_colors_tb is
 begin
 
     -- DUT Port Mapping
-    dut : invert_colors port map(clk=>clk, sel=>sel, rgb_in=>rgb_in, rgb_out=>rgb_out);
+    dut : invert_colors port map(sel=>sel, rgb_in=>rgb_in, rgb_out=>rgb_out);
     
     -- Clock
     clk <= not clk after period / 2;
