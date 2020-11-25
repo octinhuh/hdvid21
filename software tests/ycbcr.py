@@ -113,7 +113,7 @@ def ycbcr_to_rgb(image, constants=K_VALS):
 
 if __name__ == "__main__":
 
-  img = cv2.imread('me.png')
+  img = cv2.imread('software tests/full_ycbcr_demo/surf.png')
   img2 = rgb_to_ycbcr(img)
   #img3 = cv2.cvtColor(img2, cv2.COLOR_YCrCb2RGB)
   #img4 = cv2.cvtColor(img, cv2.COLOR_RGB2YCrCb)
