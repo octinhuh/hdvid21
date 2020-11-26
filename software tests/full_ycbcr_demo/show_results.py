@@ -8,7 +8,7 @@ from the ycbcr vhdl simulation
 import numpy as np
 import cv2, json, sys
 
-DEFAULT_SETTINGS = "software tests/full_ycbcr_demo/test-settings.json"
+DEFAULT_SETTINGS = "test-settings.json"
 
 def build_image(lines, image):
   """
@@ -49,15 +49,16 @@ if __name__ == "__main__":
 
   # put the output csv data into result
   with open(settings["output name"], "r") as f:
-    
+    print("Reconstructing image...")
     build_image(f.readlines(), result)
 
-  with open("temp.csv", "r") as f:
+  with open(settings["temp name"], "r") as f:
 
     build_image(f.readlines(), temp)
 
   temp = cv2.cvtColor(temp, cv2.COLOR_YCrCb2RGB)
 
+  print("Displaying result windows")
   cv2.imshow('original', original)
   cv2.imshow('result', result)
   cv2.imshow("intermediate", temp)

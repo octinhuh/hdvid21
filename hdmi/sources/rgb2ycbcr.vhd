@@ -43,7 +43,7 @@ end rgb2ycbcr;
 architecture Behavioral of rgb2ycbcr is
 
     constant real_mult : integer := 10; -- multiply real constants by this power of 2
-    constant reg_len : integer := 18; -- length of the math buses
+    constant reg_len : integer := 20; -- length of the math buses
 
     -- values of K_R, K_G, K_B. (may not be needed depending on implementation
     -- assign them s.t. kr+kg+kb = 1
@@ -51,46 +51,52 @@ architecture Behavioral of rgb2ycbcr is
     constant kg : real range 0.0 to 1.0 := 0.587;
     constant kb : real range 0.0 to 1.0 := 0.114;
     
-    constant mat_1_0 : real := -0.5 * kr / (1.0 - kb);
-    constant mat_1_1 : real := -0.5 * kg / (1.0 - kb);
-    constant mat_1_2 : real := 0.5;
-    constant mat_2_0 : real := 0.5;
-    constant mat_2_1 : real := -0.5 * kg / (1.0 - kr);
-    constant mat_2_2 : real := -0.5 * kb / (1.0 - kr);
+    -- color matrix
+    constant m00 : signed := to_signed(integer(kr * real(2 ** real_mult)), reg_len);
+    constant m01 : signed := to_signed(integer(kg * real(2 ** real_mult)), reg_len);
+    constant m02 : signed := to_signed(integer(kb * real(2 ** real_mult)), reg_len);
+    constant m10 : signed := to_signed(integer(-0.5 * kr / (1.0 - kb) * real(2 ** real_mult)), reg_len);
+    constant m11 : signed := to_signed(integer((-kb*(2.0-2.0*kb)/kg) * real(2 ** real_mult)), reg_len);
+    constant m12 : signed := to_signed(integer(0.5 * real(2 ** real_mult)), reg_len);
+    constant m20 : signed := to_signed(integer(0.5 * real(2 ** real_mult)), reg_len);
+    constant m21 : signed := to_signed(integer(-0.5 * kg / (1.0 - kr) * real(2 ** real_mult)), reg_len);
+    constant m22 : signed := to_signed(integer(-0.5 * kb / (1.0 - kr) * real(2 ** real_mult)), reg_len);
     
     -- integer forms of the color channels
-    signal r_val, g_val, b_val : unsigned(r'length - 1 downto 0);
-    
-    signal y_val, cb_val, cr_val : unsigned(y'length - 1 downto 0);
-    
-    function real_conv( real_num: real;
-                        power: integer := real_mult) return unsigned is
-    begin
-        return to_unsigned(integer(real_num * real(2**power)), reg_len);
-    end function;
-        
-    function int_real_mult( real_num: real;
-                            int_num: unsigned) return unsigned is
-    variable temp : std_logic_vector(reg_len - 1 downto 0);
-    variable conv : std_logic_vector(real_mult + reg_len - 3 downto 0);
-    begin
-        conv := std_logic_vector(real_conv(real_num) * int_num);
-        temp := conv(reg_len - 1 downto 0);
-        return unsigned(temp(temp'length - 1 downto real_mult));
-    end function;
+    signal r_val, g_val, b_val : signed(r'length downto 0);
+    signal y_val, cb_val, cr_val : signed(m02'length + r_val'length - 1 downto 0);
 
 begin
 
-    r_val <= unsigned(r);
-    g_val <= unsigned(g);
-    b_val <= unsigned(b);
+    r_val <= signed('0' & unsigned(r));
+    g_val <= signed('0' & unsigned(g));
+    b_val <= signed('0' & unsigned(b));
     
-    y_val <= int_real_mult(kr, r_val) + int_real_mult(kg, g_val) + int_real_mult(kb, b_val);
-    cb_val <= 128 + int_real_mult(mat_1_0, r_val) + int_real_mult(mat_1_1, g_val) + int_real_mult(mat_1_2, b_val);
-    cr_val <= 128 + int_real_mult(mat_2_0, r_val) + int_real_mult(mat_2_1, g_val) + int_real_mult(mat_2_2, b_val);
+    y_val <= (m00*r_val) + (m01*g_val) + (m02*b_val);
+    cb_val <= (m10*r_val) + (m11*g_val) + (m12*b_val) + (128 * (2 ** real_mult));
+    cr_val <= (m20*r_val) + (m21*g_val) + (m22*b_val) + (128 * (2 ** real_mult));
     
-    y <= std_logic_vector(y_val);
-    cb<= std_logic_vector(cb_val);
-    cr<= std_logic_vector(cr_val);
+    process (y_val, cb_val, cr_val)
+    begin
+    
+        if y_val(y_val'length - 1) = '1' then
+            y <= x"00";
+        else
+            y <= std_logic_vector(y_val(real_mult + y'length - 1 downto real_mult));
+        end if;
+        
+        if cb_val(cb_val'length - 1) = '1' then
+            cb <= x"00";
+        else
+            cb <= std_logic_vector(cb_val(real_mult + cb'length - 1 downto real_mult));
+        end if;
+        
+        if cr_val(cr_val'length - 1) = '1' then
+            cr <= x"00";
+        else
+            cr <= std_logic_vector(cr_val(real_mult + cr'length - 1 downto real_mult));
+        end if;
+    
+    end process;
 
 end Behavioral;

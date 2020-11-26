@@ -1,9 +1,10 @@
 {
   "image": {
-    "name": "software tests/full_ycbcr_demo/jdm.jpg",
+    "name": "surf.png",
     "width": 274,
     "height": 249
   },
   "input name": "input.csv",
-  "output name": "output.csv"
+  "output name": "output.csv",
+  "temp name" : "temp.csv"
 }

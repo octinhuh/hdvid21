@@ -90,7 +90,11 @@ begin
         if g_val(g_val'length - 1) = '1' then
             g <= x"00";
         else
-            g <= std_logic_vector(g_val(real_mult + g'length - 1 downto real_mult));
+            if g_val(g_val'length - 1 downto real_mult + g'length) /= 0 then
+                g <= x"FF";
+            else
+                g <= std_logic_vector(g_val(real_mult + g'length - 1 downto real_mult));
+            end if;
         end if;
         
         if b_val(b_val'length - 1) = '1' then
@@ -100,9 +104,5 @@ begin
         end if;
     
     end process;
-    
-    --r <= std_logic_vector(r_val(real_mult + r'length - 1 downto real_mult));
-    --g <= std_logic_vector(g_val(real_mult + g'length - 1 downto real_mult));
-    --b <= std_logic_vector(b_val(real_mult + b'length - 1 downto real_mult));
 
 end Behavioral;
