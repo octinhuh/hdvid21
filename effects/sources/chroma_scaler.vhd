@@ -44,7 +44,7 @@ end chroma_scaler;
 
 architecture Behavioral of chroma_scaler is
 
-    signal cb_int, cr_int, scale_int : integer;             -- Cb, Cr, and Scaling offset
+    signal cb_int, cr_int, scale_int : integer;             -- Cb, Cr, and scaling offset
     constant max    : integer := 255;                       -- Maximum clamp
     constant min    : integer := 0;                         -- Minimum clamp
 
