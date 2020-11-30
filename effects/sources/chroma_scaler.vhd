@@ -54,7 +54,7 @@ begin
     cr_int      <= to_integer(unsigned(cr_in));
     scale_int   <= to_integer(signed(scale));
 
-    process (cb_int, scale_int) begin
+    process (cb_int, cr_int, scale_int) begin
     
         -- Cb
         if scale_int = min then                                                                 -- No scaling
