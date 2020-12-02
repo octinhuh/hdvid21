@@ -78,7 +78,7 @@ architecture Behavioral of luma_tb is
     file file_INPUT     : text;
     file file_OUTPUT    : text;
     file file_TEMP      : text;
-    constant input_name : string := "/home/austin/Documents/SCHOOL/CMPE450/input.csv";
+    constant input_name : string := "/home/austin/Documents/SCHOOL/CMPE450/hdvid21/input.csv";
     constant output_name: string := "/home/austin/Documents/SCHOOL/CMPE450/hdvid21/tests/luma_demo/output.csv";
     constant temp_name  : string := "/home/austin/Documents/SCHOOL/CMPE450/hdvid21/tests/luma_demo/temp.csv";
 
