@@ -40,24 +40,23 @@ end luma_scaler;
 
 architecture Behavioral of luma_scaler is
     
-    signal y_int, scale_int : integer;
-    
-    constant y_max : integer := 255; -- JPEG maximum
-    constant y_min : integer := 0; -- JPEG minimum
+    constant y_min : integer := 0;
+    constant y_max : integer := 255;
+    signal s_scale : signed (9 downto 0);
+    signal sum : signed (9 downto 0);
 
 begin
+
+    sum <= signed(scale) + signed("00" & y_in);
     
-    y_int <= to_integer(unsigned(y_in));
-    scale_int <= to_integer(signed(scale));
+    process (sum) begin
     
-    process (y_int, scale_int) begin
-    
-        if y_int + scale_int > y_max then
-            y_out <= std_logic_vector(to_unsigned(y_max, y_out'length));
-        elsif y_int + scale_int < y_min then
+        if sum < y_min then
             y_out <= std_logic_vector(to_unsigned(y_min, y_out'length));
+        elsif sum > y_max then
+            y_out <= std_logic_vector(to_unsigned(y_max, y_out'length));
         else
-            y_out <= std_logic_vector(to_unsigned(y_int + scale_int, y_out'length));
+            y_out <= std_logic_vector(sum(y_out'length - 1 downto 0));
         end if;
     end process;
 

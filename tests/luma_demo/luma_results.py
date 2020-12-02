@@ -45,15 +45,23 @@ if __name__ == "__main__":
 
   original = cv2.imread(settings["image"]["name"])
   result = cv2.imread(settings["image"]["name"]) # values will be changed
+  temp = cv2.imread(settings["image"]["name"])
 
   # put the output csv data into result
   with open(settings["output name"], "r") as f:
     print("Reconstructing image...")
     build_image(f.readlines(), result)
 
+  with open(settings["temp name"], "r") as f:
+
+    build_image(f.readlines(), temp)
+
+  temp = cv2.cvtColor(temp, cv2.COLOR_YCrCb2RGB)
+
   print("Displaying result windows")
   cv2.imshow('original', original)
   cv2.imshow('result', result)
+  cv2.imshow('intermediate', temp)
 
   cv2.waitKey(0)
   cv2.destroyAllWindows()

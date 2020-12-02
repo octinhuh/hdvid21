@@ -69,7 +69,7 @@ architecture Behavioral of luma_tb is
     for uut : luma_scaler use entity work.luma_scaler(behavioral);
     
     -- scale to use for luma_scaler
-    constant scale : std_logic_vector(7 downto 0) := x"80";
+    constant scale : std_logic_vector(7 downto 0) := x"7f";
     
     -- module signals
     signal r_in, g_in, b_in, y_in, cb_temp, cr_temp, y_out, r_out, g_out, b_out : std_logic_vector(7 downto 0);
@@ -77,8 +77,10 @@ architecture Behavioral of luma_tb is
     -- testbench signals
     file file_INPUT     : text;
     file file_OUTPUT    : text;
+    file file_TEMP      : text;
     constant input_name : string := "/home/austin/Documents/SCHOOL/CMPE450/input.csv";
     constant output_name: string := "/home/austin/Documents/SCHOOL/CMPE450/hdvid21/tests/luma_demo/output.csv";
+    constant temp_name  : string := "/home/austin/Documents/SCHOOL/CMPE450/hdvid21/tests/luma_demo/temp.csv";
 
 begin
 
@@ -97,6 +99,7 @@ begin
     
         file_open(file_INPUT, input_name, read_mode);
         file_open(file_OUTPUT, output_name, write_mode);
+        file_open(file_TEMP, temp_name, write_mode);
         
         while not endfile(file_INPUT) loop
             readline(file_INPUT, v_ILINE);
@@ -120,11 +123,19 @@ begin
             write(v_OLINE, string'(","));
             write(v_OLINE, to_integer(unsigned(b_out)));
             writeline(file_OUTPUT, v_OLINE);
+            
+            write(v_OLINE, to_integer(unsigned(y_out)));
+            write(v_OLINE, string'(","));
+            write(v_OLINE, to_integer(unsigned(cr_temp)));
+            write(v_OLINE, string'(","));
+            write(v_OLINE, to_integer(unsigned(cb_temp)));
+            writeline(file_TEMP, v_OLINE);
         
         end loop;
         
         file_close(file_INPUT);
         file_close(file_OUTPUT);
+        file_close(file_TEMP);
         wait;
     
     end process io_print;

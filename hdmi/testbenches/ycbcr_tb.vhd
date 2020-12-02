@@ -66,8 +66,10 @@ architecture test of ycbcr_tb is
     -- testbench signals
     file file_INPUT     : text;
     file file_OUTPUT    : text;
-    constant input_name : string := "input.csv";
-    constant output_name: string := "output2.csv";
+    file file_TEMP      : text;
+    constant input_name : string := "/home/austin/Documents/SCHOOL/CMPE450/input.csv";
+    constant output_name: string := "/home/austin/Documents/SCHOOL/CMPE450/output.csv";
+    constant temp_name  : string := "/home/austin/Documents/SCHOOL/CMPE450/temp.csv";
 
 begin
 
@@ -84,7 +86,8 @@ begin
     begin
     
         file_open(file_INPUT, input_name, read_mode);
-        file_open(file_OUTPUT, output_name, read_mode);
+        file_open(file_OUTPUT, output_name, write_mode);
+        file_open(file_TEMP, temp_name, write_mode);
         
         while not endfile(file_INPUT) loop
             readline(file_INPUT, v_ILINE);
@@ -108,11 +111,19 @@ begin
             write(v_OLINE, string'(","));
             write(v_OLINE, to_integer(unsigned(b_out)));
             writeline(file_OUTPUT, v_OLINE);
+            
+            write(v_OLINE, to_integer(unsigned(y_temp)));
+            write(v_OLINE, string'(","));
+            write(v_OLINE, to_integer(unsigned(cr_temp)));
+            write(v_OLINE, string'(","));
+            write(v_OLINE, to_integer(unsigned(cb_temp)));
+            writeline(file_TEMP, v_OLINE);
         
         end loop;
         
         file_close(file_INPUT);
         file_close(file_OUTPUT);
+        file_close(file_TEMP);
         wait;
     
     end process io_print;
