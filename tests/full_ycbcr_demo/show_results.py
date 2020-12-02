@@ -8,7 +8,7 @@ from the ycbcr vhdl simulation
 import numpy as np
 import cv2, json, sys
 
-DEFAULT_SETTINGS = "test-settings.json"
+DEFAULT_SETTINGS = "tests/full_ycbcr_demo/test-settings.json"
 
 def build_image(lines, image):
   """
@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     build_image(f.readlines(), temp)
 
-  temp = cv2.cvtColor(temp, cv2.COLOR_YCrCb2RGB)
+  #temp = cv2.cvtColor(temp, cv2.COLOR_YCrCb2RGB)
 
   print("Displaying result windows")
   cv2.imshow('original', original)

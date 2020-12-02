@@ -7,7 +7,7 @@ Generates an input file for the full ycbcr demo testbench
 import numpy as np
 import cv2, json, sys
 
-DEFAULT_SETTINGS = "software tests/full_ycbcr_demo/test-settings.json"
+DEFAULT_SETTINGS = "tests/full_ycbcr_demo/test-settings.json"
 
 def gen_input(image):
   """

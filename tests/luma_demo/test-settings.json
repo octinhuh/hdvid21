@@ -1,10 +1,9 @@
 {
   "image": {
-    "name": "surf.png",
+    "name": "tests/luma_demo/surf.png",
     "width": 274,
     "height": 249
   },
   "input name": "input.csv",
-  "output name": "output.csv",
-  "temp name" : "temp.csv"
+  "output name": "tests/luma_demo/output.csv"
 }

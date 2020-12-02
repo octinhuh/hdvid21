@@ -1,0 +1,10 @@
+{
+  "image": {
+    "name": "tests/full_ycbcr_demo/surf.png",
+    "width": 274,
+    "height": 249
+  },
+  "input name": "input.csv",
+  "output name": "tests/full_ycbcr_demo/output.csv",
+  "temp name" : "tests/full_ycbcr_demo/temp.csv"
+}
