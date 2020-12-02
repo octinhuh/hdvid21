@@ -84,7 +84,11 @@ begin
         if r_val(r_val'length - 1) = '1' then
             r <= x"00";
         else
-            r <= std_logic_vector(r_val(real_mult + r'length - 1 downto real_mult));
+            if r_val(r_val'length - 1 downto real_mult + r'length) /= 0 then
+                r <= x"FF";
+            else
+                r <= std_logic_vector(r_val(real_mult + r'length - 1 downto real_mult));
+            end if;
         end if;
         
         if g_val(g_val'length - 1) = '1' then
@@ -100,7 +104,11 @@ begin
         if b_val(b_val'length - 1) = '1' then
             b <= x"00";
         else
-            b <= std_logic_vector(b_val(real_mult + b'length - 1 downto real_mult));
+            if b_val(b_val'length - 1 downto real_mult + b'length) /= 0 then
+                b <= x"FF";
+            else
+                b <= std_logic_vector(b_val(real_mult + b'length - 1 downto real_mult));
+            end if;
         end if;
     
     end process;

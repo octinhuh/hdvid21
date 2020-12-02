@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     build_image(f.readlines(), temp)
 
-  temp = cv2.cvtColor(temp, cv2.COLOR_YCrCb2RGB)
+  #temp = cv2.cvtColor(temp, cv2.COLOR_YCrCb2RGB)
 
   print("Displaying result windows")
   cv2.imshow('original', original)
