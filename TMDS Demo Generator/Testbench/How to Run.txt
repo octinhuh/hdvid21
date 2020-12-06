@@ -1,0 +1,4 @@
+Add file "input.csv" to "Add or create simulation sources"
+Copy all data into input.csv. 
+Change simulation runtime parameter to 1 second. 
+Run simulation.
