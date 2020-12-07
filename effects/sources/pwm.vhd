@@ -33,7 +33,7 @@ entity square_wave_gen is
     Port ( period : in  STD_LOGIC_VECTOR (15 downto 0); -- num clock pulses in one cycle
            scale : in  STD_LOGIC_VECTOR (3 downto 0); -- multiply period by 2^(scale)
            enable : in  STD_LOGIC;
-			  clock : in STD_LOGIC;
+		   clock : in STD_LOGIC;
            wave_out : inout  STD_LOGIC);
 end square_wave_gen;
 
