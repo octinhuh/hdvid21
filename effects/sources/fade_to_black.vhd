@@ -21,10 +21,11 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
+use IEEE.NUMERIC_STD.ALL;
+use IEEE.std_logic_unsigned.all;
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
-use IEEE.NUMERIC_STD.ALL;
+
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx leaf cells in this code.
@@ -35,8 +36,12 @@ entity fade_to_black is
   Port ( 
     clk: in std_logic;
     en: in std_logic;
-    rgb_in : in  std_logic_vector(23 downto 0);
-    rgb_out: out std_logic_vector(23 downto 0);
+    int_clk : in std_logic; 
+    r_in_8 : in  std_logic_vector(7 downto 0);
+    g_in_8 : in  std_logic_vector(7 downto 0);
+    b_in_8 : in  std_logic_vector(7 downto 0);
+    
+--    rgb_out: out std_logic_vector(23 downto 0);
     r_out_8: out std_logic_vector(7 downto 0);
     g_out_8: out std_logic_vector(7 downto 0);
     b_out_8: out std_logic_vector(7 downto 0)
@@ -45,56 +50,60 @@ entity fade_to_black is
 end fade_to_black;
 
 architecture Behavioral of fade_to_black is
-    
-    signal r_temp_12, b_temp_12, g_temp_12: std_logic_vector(11 downto 0):= x"000";
-    signal r_temp_8: std_logic_vector(7 downto 0):= rgb_in(23 downto 16); 
-    signal g_temp_8: std_logic_vector(7 downto 0):= rgb_in(15 downto 8); 
-    signal b_temp_8:  std_logic_vector(7 downto 0):= rgb_in(7 downto 0);
-
-    constant mult: std_logic_vector(3 downto 0):= "1100";
+    signal temp_r,temp_g,temp_b : std_logic_vector(7 downto 0);
+    signal cnt : unsigned(7 downto 0) := "00000000";
+    signal modifier : std_logic_vector(3 downto 0) := "1000";
 begin
-
-    process (clk, en) begin
+process(clk,en)
+begin
+    if(en = '1' and clk = '1') then
+            if(modifier /= "0000") then
+                modifier <= modifier - '1';
+                end if;
+     end if;
     
-    --do a fade
-    if (clk = '1') and (en = '1') then
-    
-        r_temp_8 <= rgb_in(23 downto 16);
-        g_temp_8 <= rgb_in(15 downto 8);
-        b_temp_8 <= rgb_in(7 downto 0);
-    
-       -- r_temp_12(7 downto 0) <= r_temp_8;
-       -- g_temp_12(7 downto 0) <= g_temp_8;
-       -- b_temp_12(7 downto 0) <= b_temp_8;
-       -- r_temp_12 <= std_logic_vector(unsigned(r_temp_8) * unsigned(mult));  
-       -- g_temp_12 <= std_logic_vector(unsigned(g_temp_8) * unsigned(mult));  
-       -- b_temp_12 <= std_logic_vector(unsigned(b_temp_8) * unsigned(mult));    
-  
---        r_temp_8 <= r_temp_12(11 downto 4);
---        g_temp_8 <= g_temp_12(11 downto 4);
---        b_temp_8 <= b_temp_12(11 downto 4);
-          
-    --      r_out <= r_temp_8;
-      --    g_out <= g_temp_8;
-        --  b_out <= b_temp_8;
-          
-          rgb_out(23 downto 16) <= r_temp_8;
-          rgb_out(15 downto 8) <= g_temp_8;
-          rgb_out(7 downto 0) <= b_temp_8; 
-          
-          r_out_8 <= r_temp_8;
-          g_out_8 <= g_temp_8;
-          b_out_8 <= b_temp_8;
-          
-    else
-        rgb_out(23 downto 16) <= r_temp_8;
-        rgb_out(15 downto 8) <= g_temp_8;
-        rgb_out(7 downto 0) <= b_temp_8;
+end process;    
+process(int_clk)
+begin
+    if(modifier = "1000") then
+        temp_r <= r_in_8;  
+        temp_g <= g_in_8;  
+        temp_b <= b_in_8;
+    elsif(modifier = "0111") then
+        temp_r <= "0" & r_in_8(7 downto 1);  
+        temp_g <= "0" & g_in_8(7 downto 1);  
+        temp_b <= "0" & b_in_8(7 downto 1);
+    elsif(modifier = "0110") then
+        temp_r <= "00" & r_in_8(7 downto 2);  
+        temp_g <= "00" & g_in_8(7 downto 2);  
+        temp_b <= "00" & b_in_8(7 downto 2);  
+    elsif(modifier = "0101") then
+        temp_r <= "000" & r_in_8(7 downto 3);  
+        temp_g <= "000" & g_in_8(7 downto 3);  
+        temp_b <= "000" & b_in_8(7 downto 3);  
+    elsif(modifier = "0100") then
+        temp_r <= "0000" & r_in_8(7 downto 4);  
+        temp_g <= "0000" & g_in_8(7 downto 4);  
+        temp_b <= "0000" & b_in_8(7 downto 4);
+    elsif(modifier = "0011") then
+        temp_r <= "00000" & r_in_8(7 downto 5);  
+        temp_g <= "00000" & g_in_8(7 downto 5);  
+        temp_b <= "00000" & b_in_8(7 downto 5);
+    elsif(modifier = "0010") then
+        temp_r <= "000000" & r_in_8(7 downto 6);  
+        temp_g <= "000000" & g_in_8(7 downto 6);  
+        temp_b <= "000000" & b_in_8(7 downto 6);
+    elsif(modifier = "0001") then
+        temp_r <= "0000000" & r_in_8(7);  
+        temp_g <= "0000000" & g_in_8(7);  
+        temp_b <= "0000000" & b_in_8(7);
+    elsif(modifier = "0000") then 
+        temp_r <= "00000000"; 
+        temp_g <= "00000000"; 
+        temp_b <= "00000000"; 
     end if;
-    end process;
-    
---    rgb_out(23 downto 16) <= r_temp_8;   
---    rgb_out(15 downto 8) <= g_temp_8;
---    rgb_out(7 downto 0) <= b_temp_8;
-    --rgb_out <= rgb_in;
+end process;
+    r_out_8 <= temp_r;
+    g_out_8 <= temp_g;
+    b_out_8 <= temp_b;
 end Behavioral;
