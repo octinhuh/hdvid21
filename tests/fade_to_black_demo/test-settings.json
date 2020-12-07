@@ -1,0 +1,18 @@
+{
+    "image": {
+      "name": "dog.jpg",
+      "width": 620,
+      "height": 916
+    },
+    "input name": "input.csv",
+    "output name1": "output1.csv",
+    "output name2": "output2.csv",
+    "output name3": "output3.csv",
+    "output name4": "output4.csv",
+    "output name5": "output5.csv",
+    "output name6": "output6.csv",
+    "output name7": "output7.csv",
+    "output name8": "output8.csv",
+    "output name9": "output9.csv",
+    "temp name" : "temp.csv"
+  }
