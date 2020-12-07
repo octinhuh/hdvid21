@@ -1,0 +1,10 @@
+{
+    "image": {
+      "name": "dog.jpg",
+      "width": 620,
+      "height": 916
+    },
+    "input name": "input.csv",
+    "output name": "outputCHR.csv",
+    "temp name" : "temp.csv"
+  }
