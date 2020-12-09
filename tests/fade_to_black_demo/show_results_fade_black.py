@@ -46,7 +46,7 @@ if __name__ == "__main__":
   original = cv2.imread(settings["image"]["name"])
   img = cv2.imread(settings["image"]["name"]) # values will be changed
 
-  out = cv2.VideoWriter('output_vid.mp4', cv2.VideoWriter_fourcc(*'XVID'), settings["frames"], original.shape[:-1])
+  out = cv2.VideoWriter('output_vid.mp4', cv2.VideoWriter_fourcc(*'MJPG'), settings["rate"], (200, 110))
   #out.write(original)
   # put the output csv data into result
   with open(settings["output name"], "r") as f:
@@ -61,3 +61,6 @@ if __name__ == "__main__":
       build_image(csv_str[line_index[0]:line_index[1]], img)
       out.write(img)
 
+  #cv2.imshow('last_frame', img)
+  #cv2.waitKey(0)
+  #cv2.destroyAllWindows()

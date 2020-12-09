@@ -59,9 +59,9 @@ architecture test of fade_to_black_tb_IM is
     -- testbench signals
     file file_INPUT     : text;
     file file_OUTPUT    : text;
-    constant input_name : string := "/home/austin/Documents/SCHOOL/CMPE450/hdvid21/input.csv";
-    constant output_name: string := "/home/austin/Documents/SCHOOL/CMPE450/hdvid21/output.csv";
-    constant num_frames : integer := 90;
+    constant input_name : string := "input.csv";
+    constant output_name: string := "output.csv";
+    constant num_frames : integer := 180;
 begin
  
     fade : fade_to_black port map(r_in_8 => r_in,
@@ -73,7 +73,15 @@ begin
                                   en => en,
                                   clk => clk,
                                   int_clk => int_clk);
-                                  
+
+    process
+    begin
+    
+        wait for 19.8 ms;
+        en <= '0'; -- toggle the enable, now fade FROM black
+        wait;
+    
+    end process;
     
     io_print : process
     
@@ -86,7 +94,6 @@ begin
     
     begin
 
-        
         file_open(file_OUTPUT, output_name, write_mode);
         
         while frame < num_frames loop
@@ -101,9 +108,7 @@ begin
                 read(v_ILINE, g);
                 read(v_ILINE, v_COMMA);
                 read(v_ILINE, b);
-                
-                
-                
+            
                 -- pass the data into the modules
                 r_in <= std_logic_vector(to_unsigned(r, r_in'length));
                 g_in <= std_logic_vector(to_unsigned(g, g_in'length));
@@ -121,7 +126,7 @@ begin
                 
             end loop;
             
-            for I in 0 to 256 / num_frames loop
+            for I in 0 to 1024 / num_frames loop
                 clk <= '0';
                 wait for 1 ns;
                 clk <= '1';
