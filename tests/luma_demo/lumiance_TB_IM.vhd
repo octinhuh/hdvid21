@@ -21,7 +21,7 @@ architecture test of luminance_TB_IM is
     component luma_scaler
         Port (             -- Inputs
             y_in    : in STD_LOGIC_VECTOR (7 downto 0);     -- Cb (in)
-            scale    : in STD_LOGIC_VECTOR (7 downto 0);     -- Scaling offset
+            scale    : in STD_LOGIC_VECTOR (8 downto 0);     -- Scaling offset
             -- Outputs
             y_out   : out STD_LOGIC_VECTOR (7 downto 0));    -- Cb (out)
        end component;
@@ -55,7 +55,7 @@ architecture test of luminance_TB_IM is
     
     -- module signals
     signal r_in, g_in, b_in, r_out, b_out, g_out, y,cb,cr,y_out : std_logic_vector(7 downto 0);
-    signal scale : std_logic_vector(7 downto 0); 
+    signal scale : std_logic_vector(8 downto 0); 
     signal clk75: std_logic := '0';
     signal en : std_logic := '1';
     signal TMDS_Clk_n, TMDS_Clk_p : std_logic;
@@ -98,7 +98,7 @@ begin
 --                                   TMDS_Data_p => TMDS_Data_p,
 --                                   clk75 => clk75); 
     clk75 <= not clk75 after 6.67 ns; 
-    scale <= "01100010";
+    scale <= "110000100";
     
     io_print : process
     

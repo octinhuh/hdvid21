@@ -12,38 +12,21 @@ use IEEE.NUMERIC_STD.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity chrominance_TB_IM is
+entity multi_function_TB_IM is
 --  Port ( );
-end chrominance_TB_IM;
+end multi_function_TB_IM;
 
-architecture test of chrominance_TB_IM is
+architecture test of multi_function_TB_IM is
 
-    component chroma_scaler
+    component multiple_mod
         Port (             -- Inputs
-            cb_in    : in STD_LOGIC_VECTOR (7 downto 0);     -- Cb (in)
-            cr_in    : in STD_LOGIC_VECTOR (7 downto 0);     -- Cr (in)
-            scale_cb   : in STD_LOGIC_VECTOR (7 downto 0);     -- Scaling offset
-            scale_cr   : in STD_LOGIC_VECTOR (7 downto 0);     -- Scaling offset
-            -- Outputs
-            cb_out   : out STD_LOGIC_VECTOR (7 downto 0);    -- Cb (out)
-            cr_out   : out STD_LOGIC_VECTOR (7 downto 0));   -- Cr (out)
+                inv_sel : in std_logic;
+                lum_scale : in std_logic_vector(8 downto 0);
+                cb_scale,cr_scale : in std_logic_vector(7 downto 0);
+                r,g,b : in std_logic_vector(7 downto 0);
+                r_out,g_out,b_out : out std_logic_vector(7 downto 0)); 
        end component;
-     component  rgb2ycbcr   
-        Port ( r : in STD_LOGIC_VECTOR (7 downto 0);
-           g : in STD_LOGIC_VECTOR (7 downto 0);
-           b : in STD_LOGIC_VECTOR (7 downto 0);
-           y : out STD_LOGIC_VECTOR (7 downto 0);
-           cb : out STD_LOGIC_VECTOR (7 downto 0);
-           cr : out STD_LOGIC_VECTOR (7 downto 0));
-       end component;
-       component ycbcr2rgb 
-        Port ( y : in STD_LOGIC_VECTOR (7 downto 0);
-           cb : in STD_LOGIC_VECTOR (7 downto 0);
-           cr : in STD_LOGIC_VECTOR (7 downto 0);
-           r : out STD_LOGIC_VECTOR (7 downto 0);
-           g : out STD_LOGIC_VECTOR (7 downto 0);
-           b : out STD_LOGIC_VECTOR (7 downto 0));
-        end component;
+
 --UNCOMMENT IF YOU WANT TMDS SIGNAL GEN, BE SURE TO ADD FILES FROM GITHUB
      component tmds_signal_gen
         Port( B_in : in STD_LOGIC_VECTOR ( 7 downto 0 );
@@ -57,45 +40,38 @@ architecture test of chrominance_TB_IM is
        end component;
     
     -- module signals
-    signal r_in, g_in, b_in, r_out, b_out, g_out, y,cb,cr,cb_out,cr_out : std_logic_vector(7 downto 0);
-    signal scale_cb, scale_cr : std_logic_vector(7 downto 0); --Represented as xxx.xxxxx 
+    signal r_in, g_in, b_in, r_out, b_out, g_out : std_logic_vector(7 downto 0);
+    signal cb_scale, cr_scale : std_logic_vector(7 downto 0); --Represented as xxx.xxxxx 
+    signal lum_scale : std_logic_vector(8 downto 0);
+    signal inv_sel : std_logic;
     signal clk75: std_logic := '0';
     signal en : std_logic := '1';
     signal TMDS_Clk_n, TMDS_Clk_p : std_logic;
     signal TMDS_Data_n, TMDS_Data_p : std_logic_vector(2 downto 0);
-    signal TMDS_Clk_n2, TMDS_Clk_p2 : std_logic;
+     signal TMDS_Clk_n2, TMDS_Clk_p2 : std_logic;
     signal TMDS_Data_n2, TMDS_Data_p2 : std_logic_vector(2 downto 0);
     -- testbench signals
     file file_INPUT     : text;
     file file_OUTPUT    : text;
     constant input_name : string := "input.csv";
-    constant output_name: string := "outputCHR.csv";
+    constant output_name: string := "outputMUL.csv";
 
 begin
  
-    uut: chroma_scaler Port map (           
-                                cb_in => cb,   
-                                cr_in => cr,    
-                                scale_cb => scale_cb,
-                                scale_cr => scale_cr,   
-                                cb_out => cb_out,
-                                cr_out => cr_out);
+    uut: multiple_mod Port map (                 
+                                inv_sel => inv_sel,
+                                lum_scale => lum_scale,
+                                cb_scale => cb_scale,
+                                cr_scale => cr_scale,
+                                r => r_in,
+                                g => g_in,
+                                b => b_in,
+                                r_out => r_out,
+                                g_out => g_out,
+                                b_out => b_out      
+                                );
        
-    uus : rgb2ycbcr  Port map ( 
-                               r => r_in,
-                               g => g_in,
-                               b => b_in,
-                               y => y,
-                               cb => cb,
-                               cr => cr);
-
-    uur : ycbcr2rgb  Port map ( 
-                               y => y,
-                               cb => cb_out,
-                               cr => cr_out,
-                               r => r_out,
-                               g => g_out,
-                               b => b_out);
+  
 --UNCOMMENT IF YOU WANT TMDS_SIGNAL GEN, BE SURE TO ADD FILES FROM GITHUB                                  
 --     tmds : tmds_signal_gen port map(R_in => r_out,
 --                                   G_in => g_out,
@@ -105,7 +81,7 @@ begin
 --                                   TMDS_Data_n => TMDS_Data_n,
 --                                   TMDS_Data_p => TMDS_Data_p,
 --                                   clk75 => clk75); 
---    tmds2 : tmds_signal_gen port map(R_in => r_in,
+--     tmds2 : tmds_signal_gen port map(R_in => r_in,
 --                                   G_in => g_in,
 --                                   B_in => b_in, 
 --                                   TMDS_Clk_n => TMDS_Clk_n2,
@@ -113,10 +89,11 @@ begin
 --                                   TMDS_Data_n => TMDS_Data_n2,
 --                                   TMDS_Data_p => TMDS_Data_p2,
 --                                   clk75 => clk75); 
-    clk75 <= not clk75 after 6.67 ns; 
-    scale_cb <= "00000001";
-    scale_cr <= "01000000";
-    
+--    clk75 <= not clk75 after 6.67 ns; 
+    cb_scale <= "00100000"; --xxx.xxxxx
+    cr_scale <= "00100000";
+    lum_scale <= "011100000";
+    inv_sel <= '1';
     io_print : process
     
     variable v_ILINE    : line;

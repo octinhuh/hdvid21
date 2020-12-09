@@ -34,7 +34,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity luma_scaler is
     Port (
            y_in : in STD_LOGIC_VECTOR (7 downto 0);
-           scale : in STD_LOGIC_VECTOR (7 downto 0); -- signed value to increase/decrease luma by
+           scale : in STD_LOGIC_VECTOR (8 downto 0); -- signed value to increase/decrease luma by
            y_out : out STD_LOGIC_VECTOR (7 downto 0));
 end luma_scaler;
 
@@ -43,11 +43,11 @@ architecture Behavioral of luma_scaler is
     constant y_min : integer := 0;
     constant y_max : integer := 255;
     signal s_scale : signed (9 downto 0);
-    signal sum : signed (9 downto 0);
+    signal sum : signed (10 downto 0);
 
 begin
 
-    sum <= signed(scale) + signed("00" & y_in);
+    sum <= signed(scale) + signed("000" & y_in);
     
     process (sum) begin
     
