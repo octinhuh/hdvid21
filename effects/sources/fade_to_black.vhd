@@ -63,11 +63,11 @@ architecture Behavioral of fade_to_black is
     
     --constant scale : std_logic_vector(3 downto 0) := "1000"; -- divide the period by 2^8
     --constant period: std_logic_vector(15 downto 0):= x"4dca";
-    constant scale : std_logic_vector(3 downto 0) := "0000"; -- divide the period by 2^8
-    constant period: std_logic_vector(15 downto 0):= x"002";
+    constant scale : std_logic_vector(3 downto 0) := x"0"; -- divide the period by 2^8
+    constant period: std_logic_vector(15 downto 0):= x"0002";
 
-    signal temp_r,temp_g,temp_b : unsigned(15 downto 0);
-    signal modifier : unsigned(8 downto 0) := x"100";
+    signal modifier : unsigned(8 downto 0) := "100000000";
+    signal temp_r,temp_g,temp_b : unsigned(modifier'length + r_in_8'length - 1 downto 0);
     signal s_clk : std_logic; -- divided clock for the multiplier
     
 begin

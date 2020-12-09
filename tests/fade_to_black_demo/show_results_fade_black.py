@@ -8,7 +8,7 @@ from the ycbcr vhdl simulation
 import numpy as np
 import cv2, json, sys
 
-DEFAULT_SETTINGS = "test-settings.json"
+DEFAULT_SETTINGS = "tests/fade_to_black_demo/test-settings.json"
 
 def build_image(lines, image):
   """
@@ -44,57 +44,20 @@ if __name__ == "__main__":
     settings = json.load(f)
 
   original = cv2.imread(settings["image"]["name"])
-  result1 = cv2.imread(settings["image"]["name"]) # values will be changed
-  result2 = cv2.imread(settings["image"]["name"]) # values will be changed
-  result3 = cv2.imread(settings["image"]["name"]) # values will be changed
-  result4 = cv2.imread(settings["image"]["name"]) # values will be changed
-  result5 = cv2.imread(settings["image"]["name"]) # values will be changed
-  result6 = cv2.imread(settings["image"]["name"]) # values will be changed
-  result7 = cv2.imread(settings["image"]["name"]) # values will be changed
-  result8 = cv2.imread(settings["image"]["name"]) # values will be changed
-  temp = cv2.imread(settings["image"]["name"])
-  out = cv2.VideoWriter('output_vid.mp4', cv2.VideoWriter_fourcc(*'XVID'), 5, (620,916))
-  out.write(original)
+  img = cv2.imread(settings["image"]["name"]) # values will be changed
+
+  out = cv2.VideoWriter('output_vid.mp4', cv2.VideoWriter_fourcc(*'XVID'), settings["frames"], original.shape[:-1])
+  #out.write(original)
   # put the output csv data into result
-  with open(settings["output name1"], "r") as f:
+  with open(settings["output name"], "r") as f:
     print("Reconstructing image...")
-    build_image(f.readlines(), result1)
-    out.write(result1)
+    csv_str = f.readlines()
 
-  with open(settings["output name2"], "r") as f:
-    print("Reconstructing image...")
-    build_image(f.readlines(), result2)
-    out.write(result2)
-  with open(settings["output name3"], "r") as f:
-    print("Reconstructing image...")
-    build_image(f.readlines(), result3)
-    out.write(result3)
-  with open(settings["output name4"], "r") as f:
-    print("Reconstructing image...")
-    build_image(f.readlines(), result4)
-    out.write(result4)
-  with open(settings["output name5"], "r") as f:
-    print("Reconstructing image...")
-    build_image(f.readlines(), result5)
-    out.write(result5)
-  with open(settings["output name6"], "r") as f:
-    print("Reconstructing image...")
-    build_image(f.readlines(), result6)
-    out.write(result6)
-  with open(settings["output name7"], "r") as f:
-    print("Reconstructing image...")
-    build_image(f.readlines(), result7)
-    out.write(result7)
-  with open(settings["output name8"], "r") as f:
-    print("Reconstructing image...")
-    build_image(f.readlines(), result8)
-    out.write(result8)
-
-
-  print("Displaying result windows")
-  cv2.imshow('original', original)
-  cv2.imshow('result', result8)
-
-  cv2.waitKey(0)
-  cv2.destroyAllWindows()
+    for i in range(settings["frames"]):
+      print("Processing frame:", i + 1)
+      
+      line_index = ((original.shape[0] * original.shape[1]) * i, \
+        (original.shape[0] * original.shape[1]) * (i + 1))
+      build_image(csv_str[line_index[0]:line_index[1]], img)
+      out.write(img)
 
