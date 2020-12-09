@@ -60,6 +60,8 @@ architecture test of luminance_TB_IM is
     signal en : std_logic := '1';
     signal TMDS_Clk_n, TMDS_Clk_p : std_logic;
     signal TMDS_Data_n, TMDS_Data_p : std_logic_vector(2 downto 0);
+    signal TMDS_Clk_n2, TMDS_Clk_p2 : std_logic;
+    signal TMDS_Data_n2, TMDS_Data_p2 : std_logic_vector(2 downto 0);
     -- testbench signals
     file file_INPUT     : text;
     file file_OUTPUT    : text;
@@ -89,13 +91,22 @@ begin
                                g => g_out,
                                b => b_out);
 --UNCOMMENT IF YOU WANT TMDS_SIGNAL GEN, BE SURE TO ADD FILES FROM GITHUB                                  
---     tmds : tmds_signal_gen port map(R_in => rgb_in(23 downto 16),
---                                   G_in => rgb_in(15 downto 8),
---                                   B_in => rgb_in(7 downto 0), 
+--     tmds : tmds_signal_gen port map(R_in => r_out,
+--                                   G_in => g_out,
+--                                   B_in => b_out, 
 --                                   TMDS_Clk_n => TMDS_Clk_n,
 --                                   TMDS_Clk_p => TMDS_Clk_p,
 --                                   TMDS_Data_n => TMDS_Data_n,
 --                                   TMDS_Data_p => TMDS_Data_p,
+--                                   clk75 => clk75); 
+--UNCOMMENT IF YOU WANT TMDS_SIGNAL GEN, BE SURE TO ADD FILES FROM GITHUB                                  
+--     tmds2 : tmds_signal_gen port map(R_in => r_in),
+--                                   G_in => g_in,
+--                                   B_in => b_in, 
+--                                   TMDS_Clk_n => TMDS_Clk_n2,
+--                                   TMDS_Clk_p => TMDS_Clk_p2,
+--                                   TMDS_Data_n => TMDS_Data_n2,
+--                                   TMDS_Data_p => TMDS_Data_p2,
 --                                   clk75 => clk75); 
     clk75 <= not clk75 after 6.67 ns; 
     scale <= "110000100";
