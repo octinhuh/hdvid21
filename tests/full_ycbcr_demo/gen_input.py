@@ -7,7 +7,7 @@ Generates an input file for the full ycbcr demo testbench
 import numpy as np
 import cv2, json, sys
 
-DEFAULT_SETTINGS = "tests/full_ycbcr_demo/test-settings.json"
+DEFAULT_SETTINGS = "test-settings-CHR.json"
 
 def gen_input(image):
   """
@@ -18,7 +18,7 @@ def gen_input(image):
   """
 
   data = cv2.imread(image["name"])
-
+  data = cv2.cvtColor(data, cv2.COLOR_BGR2RGB)
   lines = []
 
   # iterate through each pixel
