@@ -44,39 +44,27 @@ architecture Behavioral of uart_demo is
            tx : out  STD_LOGIC;
            busy : out  STD_LOGIC);
 	end component;
-	component serial_receiver
-	Port ( clock : in  STD_LOGIC;
-           rx : in  STD_LOGIC;
-           clear : in  STD_LOGIC; -- resets to 0 when set to 1
-			  enable : in STD_LOGIC; -- shifts new data in when 1
-           data : out  STD_LOGIC_VECTOR (7 downto 0);
-           busy : out  STD_LOGIC); -- high when reading data
-	end component;
 	
 	constant CLOCK_RATE : integer := 100000000;
 	constant BAUD_RATE : integer := 9600; -- bit/sec
 	constant counter_top : integer := (CLOCK_RATE / BAUD_RATE) - 1; -- cycles to have enable on for tx
 	signal counter : integer := 0;
 	
-	signal enable_tx,enable_rx,clear : STD_LOGIC;
-	signal busy_tx_temp,busy_rx_temp,old_busy_rx_temp : STD_LOGIC;
+	signal enable_tx,clear : STD_LOGIC;
+	signal busy_tx_temp : STD_LOGIC;
 	
 	signal data : STD_LOGIC_VECTOR (7 downto 0) := x"00";
 	signal tx_done : boolean := false;
-	
-	for serial1 : serial_receiver use entity work.serial_receiver(Behavioral);
 
 begin
 
 	LED(0) <= busy_tx_temp;
-	enable_rx <= '1';
 	clear <= '0';
 
 	serial0 : serial_transmitter port map(data=>data,enable=>enable_tx,clock=>CLK50MHZ,tx=>TXD,busy=>busy_tx_temp);
-	serial1 : serial_receiver port map(data=>data,enable=>enable_rx,clock=>CLK50MHZ,clear=>clear,rx=>RXD,busy=>busy_rx_temp);
 
 	-- cycle the data_index
-	process (CLK50MHZ,busy_rx_temp,enable_tx,old_busy_rx_temp,counter)
+	process (CLK50MHZ,enable_tx,counter)
 	begin
 	
 		if CLK50MHZ'event and CLK50MHZ = '1' then

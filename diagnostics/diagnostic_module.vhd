@@ -57,28 +57,14 @@ architecture Behavioral of diagnostic_module is
 	constant CLOCK_PERIOD : integer := CLOCK_RATE / BAUD_RATE;
 	constant DELIM : std_logic_vector := x"2c";
 	constant EOL : std_logic_vector := x"0a";
-	constant ZERO : std_logic_vector(7 downto 0) := "0011000";
+	constant ZERO : std_logic_vector(7 downto 0) := "00110000";
 	constant TOP : integer := 32;
-	
-	function place_bit(arr : std_logic_vector(255 downto 0);
-	                   index : integer;
-	                   val : std_logic) return std_logic_vector is
-	   variable char : std_logic_vector := ZERO & val;
-	begin
-	   if index = 32 then
-	       return char & arr(247 downto 0);
-	   elsif index = 0 then
-	       return arr(255 downto 8) & char;
-	   else
-	       return arr(255 downto index*8) & char & arr((index-1)*8+7 downto 0);
-	   end if;
-	end function;
 
-    
+    type t_arr is array (0 to 31) of std_logic_vector(7 downto 0);
 	
-	signal data_bus : std_logic_vector(256 downto 0); -- all characters go here
+	signal chars : t_arr;
 	signal current_byte : std_logic_vector(7 downto 0);
-	signal index : integer := 0;
+	signal index : integer := 31;
 	signal busy_tx_temp : std_logic;
 
 begin
@@ -86,19 +72,51 @@ begin
     tx0 : serial_transmitter port map(data=>current_byte, enable=>enable, clock=>clk, tx=>tx, busy=>busy_tx_temp);
     
     led <= busy_tx_temp;
+    current_byte <= chars(index);
     
     -- assign all of the bytes their values
     process (cr,cb,luma,invert,ftb) begin
+        -- luminance
+        for i in 0 to 8 loop
+            chars(i) <= ZERO;
+            chars(i)(7) <= luma(i);
+        end loop;
         
+        chars(9) <= DELIM;
+        
+        -- chrominance red
+        for i in 10 to 17 loop
+            chars(i) <= ZERO;
+            chars(i)(7) <= cr(i - 10);
+        end loop;
+        
+        chars(18) <= DELIM;
+        
+        -- chrominance blue
+        for i in 19 to 26 loop
+            chars(i) <= ZERO;
+            chars(i)(7) <= cb(i - 19);
+        end loop;
+        
+        chars(27) <= DELIM;
+        chars(28) <= ZERO;
+        chars(28)(7) <= invert;
+        chars(29) <= DELIM;
+        chars(30) <= ZERO;
+        chars(30)(7) <= ftb;
+        chars(31) <= EOL;
     end process;
     
     
-    process (clk)
+    
+    process (clk, busy_tx_temp)
     begin
     
         if clk = '1' and clk'event then
-            for i in 0 to 32 loop
-            end loop;
+            if busy_tx_temp = '0' then
+                -- send the next byte
+                index <= (index + 1) mod 32;
+            end if;
         end if;
     
     end process;
