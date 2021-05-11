@@ -36,15 +36,14 @@ entity fade_to_black is
   Port ( 
     clk: in std_logic;
     en: in std_logic;
-    int_clk : in std_logic; 
+    --int_clk : in std_logic; 
     r_in_8 : in  std_logic_vector(7 downto 0);
     g_in_8 : in  std_logic_vector(7 downto 0);
     b_in_8 : in  std_logic_vector(7 downto 0);
     
 --    rgb_out: out std_logic_vector(23 downto 0);
-    r_out_8: out std_logic_vector(7 downto 0);
-    g_out_8: out std_logic_vector(7 downto 0);
-    b_out_8: out std_logic_vector(7 downto 0)
+
+    rgb_out : out std_logic_vector(23 downto 0)
     );
     
 end fade_to_black;
@@ -61,15 +60,17 @@ architecture Behavioral of fade_to_black is
     
     for swg : square_wave_gen use entity work.square_wave_gen(Behavioral);
     
-    --constant scale : std_logic_vector(3 downto 0) := "1000"; -- divide the period by 2^8
-    --constant period: std_logic_vector(15 downto 0):= x"4dca";
-    constant scale : std_logic_vector(3 downto 0) := x"0"; -- divide the period by 2^8
-    constant period: std_logic_vector(15 downto 0):= x"0002";
+    constant scale : std_logic_vector(3 downto 0) := "1000"; -- divide the period by 2^8
+    constant period: std_logic_vector(15 downto 0):= x"4dca";
+    --constant scale : std_logic_vector(3 downto 0) := x"0"; -- divide the period by 2^8
+    --constant period: std_logic_vector(15 downto 0):= x"0002";
 
     signal modifier : unsigned(8 downto 0) := "100000000";
     signal temp_r,temp_g,temp_b : unsigned(modifier'length + r_in_8'length - 1 downto 0);
     signal s_clk : std_logic; -- divided clock for the multiplier
-    
+    signal r_out_8: std_logic_vector(7 downto 0);
+    signal g_out_8: std_logic_vector(7 downto 0);
+    signal b_out_8: std_logic_vector(7 downto 0);
 begin
 
     swg : square_wave_gen port map(period=>period, scale=>scale, enable=>'1', clock=>clk, wave_out=>s_clk);
@@ -97,4 +98,8 @@ begin
     g_out_8 <= std_logic_vector(temp_g(temp_g'length - 2 downto g_out_8'length));
     b_out_8 <= std_logic_vector(temp_b(temp_b'length - 2 downto b_out_8'length));
     
+    --RGB2DVI module takes in RBG data, so bottom 8 bits is G data. 
+    rgb_out(23 downto 16) <= r_out_8; 
+    rgb_out(15 downto 8)  <= b_out_8;
+    rgb_out(7 downto 0)   <= g_out_8;
 end Behavioral;

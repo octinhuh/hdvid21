@@ -20,12 +20,14 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity invert_colors is
     Port ( sel      : in STD_LOGIC;                                 -- Select
            rgb_in   : in STD_LOGIC_VECTOR(23 downto 0);             -- RGB (Input)
-           rgb_out  : out STD_LOGIC_VECTOR(23 downto 0));           -- RGB (Output)
+           r  : out STD_LOGIC_VECTOR(7 downto 0);
+           g  : out STD_LOGIC_VECTOR(7 downto 0);
+           b  : out STD_LOGIC_VECTOR(7 downto 0));           -- RGB (Output)
 end invert_colors;
 
 -- Behavior
 architecture Behavioral of invert_colors is
-
+    signal rgb_out : STD_LOGIC_VECTOR(23 downto 0);
 begin
 
 -- Invert?
@@ -36,5 +38,8 @@ process(rgb_in, sel) begin
         rgb_out <= rgb_in;                  -- Pass   : Output = Input
     end if;
 end process;
-
+    --DVI2RGB module outputs RBG data on bus, so lower 8 bits are g data instead of b data. 
+    r <= rgb_out(23 downto 16); 
+    b <= rgb_out(15 downto 8);
+    g <= rgb_out(7 downto 0);
 end Behavioral;

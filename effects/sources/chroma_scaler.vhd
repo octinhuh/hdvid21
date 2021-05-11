@@ -38,9 +38,11 @@ entity chroma_scaler is
             cr_in    : in STD_LOGIC_VECTOR (7 downto 0);     -- Cr (in)
             scale_cb : in STD_LOGIC_VECTOR (7 downto 0);     -- Scaling offset
             scale_cr : in STD_LOGIC_VECTOR (7 downto 0); 
+            clk : in STD_LOGIC;
             -- Outputs
             cb_out   : out STD_LOGIC_VECTOR (7 downto 0);    -- Cb (out)
             cr_out   : out STD_LOGIC_VECTOR (7 downto 0));   -- Cr (out)
+            
 end chroma_scaler;
 
 architecture Behavioral of chroma_scaler is
@@ -59,24 +61,25 @@ begin
     scale_int_cr   <= unsigned(scale_cr);
     scaling <= scale_int_cb * cb_int;
     scaling2 <= scale_int_cr * cr_int;
-process(scaling,scaling2) begin   
+process(scaling,scaling2,clk) begin   
     --cb
-    if scaling / 32 >= 255 then
-         cb_out <= std_logic_vector(to_unsigned(max, 8));
-    elsif scaling / 32 <= 0 then 
-        cb_out <= std_logic_vector(to_unsigned(min,8));
-    else
-        cb_out <= std_logic_vector(scaling(12 downto 5));
+    if (rising_edge(clk)) then
+        if scaling >= 8160 then
+             cb_out <= std_logic_vector(to_unsigned(max, 8));
+        elsif scaling <= 32 then 
+            cb_out <= std_logic_vector(to_unsigned(min,8));
+        else
+            cb_out <= std_logic_vector(scaling(12 downto 5));
+        end if;
+        
+        if scaling2 >= 8160 then
+            cr_out <= std_logic_vector(to_unsigned(max, 8));
+        elsif scaling2 <= 32 then 
+            cr_out <= std_logic_vector(to_unsigned(min,8));
+        else
+            cr_out <= std_logic_vector(scaling2(12 downto 5));
+        end if;
     end if;
-    
-    if scaling2 / 32 >= 255 then
-        cr_out <= std_logic_vector(to_unsigned(max, 8));
-    elsif scaling2 / 32 <= 0 then 
-        cr_out <= std_logic_vector(to_unsigned(min,8));
-    else
-        cr_out <= std_logic_vector(scaling2(12 downto 5));
-    end if;
-    
 end process;    
     
 --    process (cb_int, cr_int, scale_int_cb, scale_int_cr) begin

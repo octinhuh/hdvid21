@@ -34,7 +34,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity luma_scaler is
     Port (
            y_in : in STD_LOGIC_VECTOR (7 downto 0);
-           scale : in STD_LOGIC_VECTOR (8 downto 0); -- signed value to increase/decrease luma by
+           scale : in STD_LOGIC_VECTOR (8 downto 0); -- signed value to increase/decrease luma by 
            y_out : out STD_LOGIC_VECTOR (7 downto 0));
 end luma_scaler;
 

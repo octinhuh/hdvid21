@@ -37,7 +37,8 @@ entity ycbcr2rgb is
            cr : in STD_LOGIC_VECTOR (7 downto 0);
            r : out STD_LOGIC_VECTOR (7 downto 0);
            g : out STD_LOGIC_VECTOR (7 downto 0);
-           b : out STD_LOGIC_VECTOR (7 downto 0));
+           b : out STD_LOGIC_VECTOR (7 downto 0);
+           clk : in std_logic);
 end ycbcr2rgb;
 
 architecture Behavioral of ycbcr2rgb is
@@ -78,9 +79,9 @@ begin
     g_val <= (m10*y_val) + (m11*cb_val) + (m12*cr_val);
     b_val <= (m20*y_val) + (m21*cb_val) + (m22*cr_val);
     
-    process (r_val, g_val, b_val)
+    process (r_val, g_val, b_val,clk)
     begin
-    
+        if(rising_edge(clk)) then --Registering output.
         if r_val(r_val'length - 1) = '1' then
             r <= x"00";
         else
@@ -110,7 +111,7 @@ begin
                 b <= std_logic_vector(b_val(real_mult + b'length - 1 downto real_mult));
             end if;
         end if;
-    
+        end if;
     end process;
 
 end Behavioral;
